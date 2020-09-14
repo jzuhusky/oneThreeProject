@@ -1,0 +1,35 @@
+.idea/**
+
+# Py.test gen files
+**/__pycache__/
+
+# Files named "raw_data"
+**/raw_data/
+
+# Any static media
+**/static/
+
+# Files named "secrets"
+**/secrets/
+**/secret/
+
+# Python Generated Files
+*.py[cod]
+
+# Apple things
+.DS_Store
+
+# Docker
+Dockerfile.tmp
+
+# Testing
+.inenv
+.env
+.coverage
+.cache/
+
+# Don't check in venvs
+**/venv/
+
+# No dbs
+*.db
