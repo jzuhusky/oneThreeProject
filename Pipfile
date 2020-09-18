@@ -4,8 +4,20 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+jupyter = "*"
 
 [packages]
+beautifulsoup4 = "==4.9.1"
+black = "==20.8b1"
+requests = "*"
+lxml = "*"
+requests-html = "*"
+html5lib = "*"
+funcy = "*"
+psycopg2-binary = "*"
+sqlalchemy = "*"
+tqdm = "*"
+click = "*"
 
 [requires]
 python_version = "3.7"

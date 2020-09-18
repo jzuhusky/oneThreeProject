@@ -1,0 +1,7 @@
+{
+    "PG_USERNAME": "postgres",
+    "PG_PASSWORD": "password",
+    "PG_PORT": 5432,
+    "PG_DB": "onethreedb",
+    "PG_HOST": "localhost"
+}

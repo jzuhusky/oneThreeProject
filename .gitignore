@@ -33,3 +33,6 @@ Dockerfile.tmp
 
 # No dbs
 *.db
+
+# ipython stuff
+*.ipynb*
