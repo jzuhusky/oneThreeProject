@@ -32,6 +32,7 @@ def pull_drugs(drug_bank_ids: List[str]) -> List[Dict]:
     # Populate and return this list
     drugs: List[Dict] = []
 
+    # At least try to not look like a bot.
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:80.0) Gecko/20100101 Firefox/80.0",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -48,8 +49,14 @@ def pull_drugs(drug_bank_ids: List[str]) -> List[Dict]:
         smiles_formula = next(soup.find(id="smiles").next_siblings).contents[0].contents
 
         if len(smiles_formula) > 1:
-            # Cloudfare thinks we're scraping an email.
+            # Since SMILES formulas contain "@" signs, Cloudfare or other CDNs
+            # may try to obfuscate email addresses to make it harder for bots to scrape them from sites.
+            # Unfortunately, our SMILES formula gets caught in the mix sometimes, so we might need to
+            # "decode" an obfuscated email, which is really a part of the SMILES formula which we are
+            # scraping.
             for i in range(len(smiles_formula)):
+                # the obfuscated emails show up as <a> tags, regular SMILES components
+                # show up as bs4.element.String(s) or something like that.
                 if isinstance(smiles_formula[i], bs4.element.Tag):
                     smiles_formula[i] = decodeEmail(
                         smiles_formula[i].__dict__["attrs"]["data-cfemail"]
@@ -59,9 +66,6 @@ def pull_drugs(drug_bank_ids: List[str]) -> List[Dict]:
             smiles_formula = "".join(smiles_formula)
         else:
             smiles_formula = smiles_formula[0]
-
-        # Pull Alternative Chemical Identifiers
-        chem_id_header = soup.find(id="chemical-identifiers-header")
 
         drug_meta = {
             "drug_id": drug_id,
@@ -177,9 +181,6 @@ def equalize_type_ids(db_engine, drug_meta_list):
             )
 
 
-# Chopping things up like this could allow for good parallelism if we need to
-# speed things up horizontally. Just chunk up DrugIDs initally across a few processes
-# and let these functions run.
 def transform_to_db_rows(db_engine, drug_meta_list: List[Dict]) -> Dict:
     """Transform drug metadata dicts into db writeable tuples
 
