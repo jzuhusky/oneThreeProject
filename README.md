@@ -1,6 +1,10 @@
 # oneThreeProject
 
-Fair warning, this was developed locally on a Mac.
+This project contains simple scripts to create a Postgres DB locally, and run some scripts to 
+pull metadata about Drugs from drugbank.com. The scripts act as a basic ETL to get the data off the site
+and into the database. 
+
+Fair warning, this was developed locally on a Mac. Linux systems should be OK, not sure about Windows. 
 
 ## Getting Started
 
