@@ -35,10 +35,16 @@ Now, setup a local python virtualenv. I've used Pipenv, but there is a requireme
 # Using pipenv
 pipenv shell
 # Requirements.txt for virtualenv etc. 
-pip install -r requirements.txt
+python -m pip install -r requirements.txt  # or simply pip install -r requirements.txt
+```
+NOTE: If using Pipenv, the Pipfile has python 3.7 specified as the necessary version. This might precelude a successful install of the 
+necessary packages if you're using another python version. If that's the case for you, go ahead and remove the lines from the Pipfile:
+```
+[requires]
+python_version = "3.7"
 ```
 
-You'll need to run 2 commands to run the data-import:
+From your virtual environment, you'll need to run 2 commands to run the data-import:
 1. From the app's directory, Create Database tables
 ```bash
 python main.py setup-db
