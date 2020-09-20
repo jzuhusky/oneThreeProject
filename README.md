@@ -29,12 +29,18 @@ psql -h localhost -U postgres -c 'CREATE DATABASE onethreedb;'
 ```
 
 Now, setup a local python virtualenv. I've used Pipenv, but there is a requirements.txt file as well. Either should be fine for setting up an virtualenv. 
-```bash
-# 1st, install Pipenv / virtualenv, use one or the other. 
 
-# Using pipenv
+Using Pipenv
+```bash
+# Init the environment and install deps (project must be pulled first, and you must be in the dir with the Pipfile)
+pipenv install
+# activate your environment
 pipenv shell
-# Requirements.txt for virtualenv etc. 
+```
+If using venv
+```bash
+virtualenv -p python3.7 {your envs name here}
+source {your envs name here}/bin/activate
 python -m pip install -r requirements.txt  # or simply pip install -r requirements.txt
 ```
 NOTE: If using Pipenv, the Pipfile has python 3.7 specified as the necessary version. This might precelude a successful install of the 
@@ -43,7 +49,7 @@ necessary packages if you're using another python version. If that's the case fo
 [requires]
 python_version = "3.7"
 ```
-
+### Run the commands
 From your virtual environment, you'll need to run 2 commands to run the data-import:
 1. From the app's directory, Create Database tables
 ```bash
