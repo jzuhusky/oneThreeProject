@@ -17,6 +17,8 @@ plug in your own credentials into this file. Which variables to set should be se
 docker pull postgres:alpine
 
 # Run the PG instance locally, setting password to "password", default user is "postgres"
+# If you already have another PG instance running on 5432 locally,  
+# update the `-p` flags arguments using the rule `-p host_port:5432`
 docker run -p 5432:5432 -e POSTGRES_PASSWORD=password --name local-postgres -d postgres:alpine
 ```
 
