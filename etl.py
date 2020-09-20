@@ -121,6 +121,12 @@ def equalize_type_ids(db_engine, drug_meta_list):
     or Identifier Types, so they can be added to the database. These must be
     added to the database before the rest of the other data, because these will
     be referred to by FK relationships by those other tables.
+
+    This function / transformation might NOT scale well... since separate
+    processes would have different information about what was seen and not seen.
+    Maybe a map/reduce model might work well here? Scrape sites for all new ID types
+    (actions and Atl identifiers), then reduce to a single node, and hit the DB once,
+    instead of N times...
     """
 
     seen_actions = set()
