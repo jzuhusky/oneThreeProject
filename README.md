@@ -41,6 +41,8 @@ You'll need to run 2 commands to run the data-import:
 ```bash
 python main.py setup-db
 ```
+This command is idempotent. If run, any existing tables will be deleted and re-created. You may run it any number of times. 
+
 2. Run the Data Import
 ```bash
 python main.py run-import
