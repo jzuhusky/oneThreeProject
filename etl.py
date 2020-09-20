@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List
+from typing import Dict, List, Set
 
 import bs4
 from bs4 import BeautifulSoup
@@ -26,13 +26,10 @@ def pull_drugs(drug_bank_ids: List[str]) -> List[Dict]:
         (external link name/type, external link value, external link URL).
 
     """
-
     session = HTMLSession()
-
     # Populate and return this list
     drugs: List[Dict] = []
-
-    # At least try to not look like a bot.
+    # At least *try* to not look like a bot.
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:80.0) Gecko/20100101 Firefox/80.0",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
@@ -115,7 +112,7 @@ def pull_drugs(drug_bank_ids: List[str]) -> List[Dict]:
 
 
 def equalize_type_ids(db_engine, drug_meta_list):
-    """Ensure that any new Action or Identifier Types are properly added to DB
+    """Ensure that any new Action or Identifier Types are properly added to DB.
 
     Args:
         drug_meta_list: List[Dict], output of pull_drugs.
@@ -147,10 +144,10 @@ def equalize_type_ids(db_engine, drug_meta_list):
         )
         existing_identifiers = {row[0] for row in res}
 
-        new_actions = seen_actions - existing_actions
-        new_identifiers = seen_identifiers - existing_identifiers
+        new_actions: Set = seen_actions - existing_actions
+        new_identifiers: Set = seen_identifiers - existing_identifiers
 
-        # TODO: this is a bit hacky... revisit this
+        # TODO: this is a bit hacky... revisit this if I have time..
         new_actions_sql = ",".join(
             "('{}')".format(str(action)) if action else "(Null)"
             for action in new_actions
@@ -160,6 +157,10 @@ def equalize_type_ids(db_engine, drug_meta_list):
         )
 
         if new_actions:
+            # TODO(joey): I am aware of potential injection vulnerabilities here,
+            #             formatting strings with raw data is generally unwise, but for the sake
+            #             of time, I've done this using SQLAlchemy. I suppose this could have been
+            #             avoided by using psycopg2 / "mogrify"??? Can speak on this in person if necessary.
             conn.execute(
                 text(
                     """
@@ -230,6 +231,10 @@ def transform_to_db_rows(db_engine, drug_meta_list: List[Dict]) -> Dict:
 def write_rows_to_db(db_engine, data_tuples: Dict):
     """Take the output of 'transfor_to_db_row' and write to database"""
     with db_engine.connect() as conn:
+        # TODO(joey): I am aware of potential injection vulnerabilities here,
+        #             formatting strings with raw data is generaly unwise, but for the sake
+        #             of time, I've done this using SQLALchemy. I suppose this could have been
+        #             avoided by using psycopg2 / "mogrify"??? Can speak on this in person if necessary.
         if data_tuples["drug_tuples"]:
             insert_str = ",".join(str(t) for t in data_tuples["drug_tuples"])
             conn.execute(

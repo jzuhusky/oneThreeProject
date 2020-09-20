@@ -48,7 +48,7 @@ def create_tables(db_engine):
         CREATE TABLE drug_action_types (
             action_type_id SERIAL UNIQUE, 
             action_type varchar UNIQUE
-        )
+        );
         """
         create_table_stmts.append(create_drug_action_types)
 

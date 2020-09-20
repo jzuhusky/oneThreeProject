@@ -41,3 +41,6 @@ python main.py setup-db
 ```bash
 python main.py run-import
 ```
+
+## TODO:
+Write some tests. 

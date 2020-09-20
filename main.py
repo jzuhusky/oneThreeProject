@@ -31,7 +31,8 @@ def get_db_engine():
                 **db_config
             )
         )
-        # Yes, we can return within a "with" block. Python will handle cleanup of the db engine accordingly
+        # Yes, we can return within a "with" block.
+        # Python will handle cleanup of the db engine accordingly as per context mgr.
         return db_engine
 
 
@@ -46,12 +47,15 @@ def run_import():
     these steps would be broken up into DAG ETL Nodes, think "Airflow".
 
     For a simple script like this however, it's easier / cleaner / simpler
-    to not use a large "hammer" like Airflow.
+    to not use a large "hammer" like Airflow or any sort of framework.
 
     This design also leads nicely into parallelization if necessary, since the entire
     input to the etl is a list of drug ids. So the natural way to split up the work,
     would be to split the input data into N chunks and distribute across N processes.
-    The DB hits will run concurrently.
+    The way this is setup now, one script could divy up the DRUGIDs file into N sets,
+    and then run this program len(DRUGIDS)/N times.
+    We'd likely have to wrap any DB writes in a transaction / think about multiple
+    things writing to the database.
     """
     db_engine = get_db_engine()
 
@@ -59,17 +63,22 @@ def run_import():
         drug_ids = [line.strip() for line in fp]
 
     # Scrape the site, and pull the data we need
+    # This would be the "Source" in a DAG pipline, I.e. the first node
     logger.info("Scraping the Drugbank Site")
     drug_metadata = pull_drugs(drug_ids)
 
     # Check the Database against the "action" and "alt_identifier" types
     # we observe from the site, and the one's we already have in the database.
-    # Insert / Update accordingly
+    # Insert / Update accordingly. After the update, we can then insert
+    # data with references to these tables.
+    # This is simply a transformation (T in ETL), again another node / step
+    # in the pipeline.
     logger.info("Equalizing Type IDs")
     equalize_type_ids(db_engine, drug_metadata)
 
     # Transform the Metadata dicts into lists of tuples, 1 list per relation
     # so we can bulk insert accordingly
+    # The sink in the graph.
     logger.info("Transforming data to tuples for insertion")
     db_rows_to_insert: Dict = transform_to_db_rows(db_engine, drug_metadata)
 
