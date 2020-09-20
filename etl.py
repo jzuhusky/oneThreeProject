@@ -127,6 +127,10 @@ def equalize_type_ids(db_engine, drug_meta_list):
     Maybe a map/reduce model might work well here? Scrape sites for all new ID types
     (actions and Atl identifiers), then reduce to a single node, and hit the DB once,
     instead of N times...
+
+    OR! -> ALL SQL executed in this function could be within a single transaction
+    to ensure that parallel processes have all the current infomation currently
+    in the database about what was "seen" and "not seen".
     """
 
     seen_actions = set()
